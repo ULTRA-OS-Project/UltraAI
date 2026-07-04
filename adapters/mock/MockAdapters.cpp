@@ -556,34 +556,29 @@ public:
 
 namespace detail {
 
-// Self-registration entry point. Factories call this lazily so the mock
-// adapter is available even when UltraAI is linked as a static library.
-void EnsureBuiltinAdapters() {
-    static const bool once = [] {
-        using namespace mock;
-        RegisterTextLLMProvider("mock",
-            [](const TextLLMConfig& c) { return std::unique_ptr<ITextLLM>(new MockTextLLM(c)); });
-        RegisterEmbeddingsProvider("mock",
-            [](const EmbeddingsConfig& c) { return std::unique_ptr<IEmbeddings>(new MockEmbeddings(c)); });
-        RegisterSpeechToTextProvider("mock",
-            [](const SpeechToTextConfig& c) { return std::unique_ptr<ISpeechToText>(new MockSpeechToText(c)); });
-        RegisterTextToSpeechProvider("mock",
-            [](const TextToSpeechConfig& c) { return std::unique_ptr<ITextToSpeech>(new MockTextToSpeech(c)); });
-        RegisterImageGenProvider("mock",
-            [](const ImageGenConfig& c) { return std::unique_ptr<IImageGen>(new MockImageGen(c)); });
-        RegisterVisionAnalyzerProvider("mock",
-            [](const VisionAnalyzerConfig& c) { return std::unique_ptr<IVisionAnalyzer>(new MockVisionAnalyzer(c)); });
-        RegisterTranslatorProvider("mock",
-            [](const TranslatorConfig& c) { return std::unique_ptr<ITranslator>(new MockTranslator(c)); });
-        RegisterVideoGenProvider("mock",
-            [](const VideoGenConfig& c) { return std::unique_ptr<IVideoGen>(new MockVideoGen(c)); });
-        RegisterMusicGenProvider("mock",
-            [](const MusicGenConfig& c) { return std::unique_ptr<IMusicGen>(new MockMusicGen(c)); });
-        RegisterCodeAssistProvider("mock",
-            [](const CodeAssistConfig& c) { return std::unique_ptr<ICodeAssist>(new MockCodeAssist(c)); });
-        return true;
-    }();
-    (void)once;
+// Called once from EnsureBuiltinAdapters() (src/BuiltinAdapters.cpp).
+void RegisterMockAdapters() {
+    using namespace mock;
+    RegisterTextLLMProvider("mock",
+        [](const TextLLMConfig& c) { return std::unique_ptr<ITextLLM>(new MockTextLLM(c)); });
+    RegisterEmbeddingsProvider("mock",
+        [](const EmbeddingsConfig& c) { return std::unique_ptr<IEmbeddings>(new MockEmbeddings(c)); });
+    RegisterSpeechToTextProvider("mock",
+        [](const SpeechToTextConfig& c) { return std::unique_ptr<ISpeechToText>(new MockSpeechToText(c)); });
+    RegisterTextToSpeechProvider("mock",
+        [](const TextToSpeechConfig& c) { return std::unique_ptr<ITextToSpeech>(new MockTextToSpeech(c)); });
+    RegisterImageGenProvider("mock",
+        [](const ImageGenConfig& c) { return std::unique_ptr<IImageGen>(new MockImageGen(c)); });
+    RegisterVisionAnalyzerProvider("mock",
+        [](const VisionAnalyzerConfig& c) { return std::unique_ptr<IVisionAnalyzer>(new MockVisionAnalyzer(c)); });
+    RegisterTranslatorProvider("mock",
+        [](const TranslatorConfig& c) { return std::unique_ptr<ITranslator>(new MockTranslator(c)); });
+    RegisterVideoGenProvider("mock",
+        [](const VideoGenConfig& c) { return std::unique_ptr<IVideoGen>(new MockVideoGen(c)); });
+    RegisterMusicGenProvider("mock",
+        [](const MusicGenConfig& c) { return std::unique_ptr<IMusicGen>(new MockMusicGen(c)); });
+    RegisterCodeAssistProvider("mock",
+        [](const CodeAssistConfig& c) { return std::unique_ptr<ICodeAssist>(new MockCodeAssist(c)); });
 }
 
 } // namespace detail

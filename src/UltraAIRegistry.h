@@ -13,7 +13,7 @@
 namespace UltraAI {
 namespace detail {
 
-// Defined in adapters/mock/MockRegistration.cpp (or the no-mock stub).
+// Defined in src/BuiltinAdapters.cpp.
 // Called lazily by every factory so builtin adapters self-register even
 // when UltraAI is consumed as a static library.
 void EnsureBuiltinAdapters();

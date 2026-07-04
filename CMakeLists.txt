@@ -15,15 +15,16 @@ option(ULTRAAI_USE_ULTRAVAULT "Link UltraVault for named-secret lookup"       OF
 
 # Adapters are independently opt-in via ULTRAAI_ADAPTER_<NAME>.
 option(ULTRAAI_ADAPTER_MOCK  "Build the in-process mock adapters"             ON)
-# Future network adapters (require ULTRAAI_USE_ULTRANET):
+option(ULTRAAI_ADAPTER_LOCAL "Build adapters for local OpenAI-compatible model servers (llama.cpp, Ollama, LocalAI, vLLM, whisper.cpp, ...)" OFF)
+# Future cloud adapters (require ULTRAAI_USE_ULTRANET):
 #   option(ULTRAAI_ADAPTER_ANTHROPIC   ...)
 #   option(ULTRAAI_ADAPTER_OPENAI      ...)
-#   option(ULTRAAI_ADAPTER_LOCAL_LLAMA ...)
 
 # ---------------------------------------------------------------- library
 
 set(ULTRAAI_SOURCES
     src/UltraAICommon.cpp
+    src/BuiltinAdapters.cpp
     src/FactoryTextLLM.cpp
     src/FactoryEmbeddings.cpp
     src/FactorySpeechToText.cpp
@@ -38,8 +39,15 @@ set(ULTRAAI_SOURCES
 
 if(ULTRAAI_ADAPTER_MOCK)
     list(APPEND ULTRAAI_SOURCES adapters/mock/MockAdapters.cpp)
-else()
-    list(APPEND ULTRAAI_SOURCES src/NoBuiltinAdaptersStub.cpp)
+endif()
+if(ULTRAAI_ADAPTER_LOCAL)
+    list(APPEND ULTRAAI_SOURCES
+        adapters/common/MiniJson.cpp
+        adapters/common/Base64.cpp
+        adapters/common/HttpClient.cpp
+        adapters/common/SseParser.cpp
+        adapters/local/LocalAdapters.cpp
+    )
 endif()
 
 add_library(ultraai STATIC ${ULTRAAI_SOURCES})
@@ -50,6 +58,16 @@ target_include_directories(ultraai
             $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
+if(ULTRAAI_ADAPTER_MOCK)
+    target_compile_definitions(ultraai PRIVATE ULTRAAI_HAS_MOCK_ADAPTERS=1)
+endif()
+if(ULTRAAI_ADAPTER_LOCAL)
+    target_compile_definitions(ultraai PRIVATE ULTRAAI_HAS_LOCAL_ADAPTERS=1)
+    if(WIN32)
+        target_link_libraries(ultraai PRIVATE ws2_32)
+    endif()
+endif()
 
 if(MSVC)
     target_compile_options(ultraai PRIVATE /W4)
@@ -96,6 +114,15 @@ if(ULTRAAI_BUILD_TESTS)
     ultraai_add_test(ultraai_test_core  tests/TestCore.cpp)
     ultraai_add_test(ultraai_test_text  tests/TestTextCapabilities.cpp)
     ultraai_add_test(ultraai_test_media tests/TestMediaCapabilities.cpp)
+
+    if(ULTRAAI_ADAPTER_LOCAL)
+        find_package(Threads REQUIRED)
+        ultraai_add_test(ultraai_test_local tests/TestLocalAdapters.cpp)
+        target_link_libraries(ultraai_test_local PRIVATE Threads::Threads)
+        if(WIN32)
+            target_link_libraries(ultraai_test_local PRIVATE ws2_32)
+        endif()
+    endif()
 endif()
 
 # ---------------------------------------------------------------- install

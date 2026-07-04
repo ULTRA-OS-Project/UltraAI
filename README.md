@@ -145,15 +145,16 @@ cmake -S UltraAI -B build \
 
 ---
 
-## Status (v0.1)
+## Status (v0.2-dev)
 
 | Component | State |
 |---|---|
 | 10 capability interfaces | Complete |
 | Mock adapters (every capability) | Complete |
 | Registry / factory plumbing | Complete |
-| Unit tests | Complete (3 executables, all passing) |
-| Real network adapters | Not yet — pending UltraNet integration |
+| Local adapters (`ULTRAAI_ADAPTER_LOCAL`, provider `"local"`) | 8 capabilities against OpenAI-compatible local servers (llama.cpp, Ollama, LocalAI, vLLM, whisper.cpp, ...) |
+| Unit tests | Complete (4 executables incl. fake-server adapter tests, all passing) |
+| Cloud network adapters | Not yet — pending UltraNet integration |
 | UltraVault credential lookup | Wired, awaits UltraVault module |
 
 ---
@@ -165,6 +166,8 @@ cmake -S UltraAI -B build \
   threading model, adapter checklist.
 * [`Docs/UltraVault.md`](Docs/UltraVault.md) —
   credential-storage architecture comparison and recommendation.
+* [`Docs/LocalAdapters.md`](Docs/LocalAdapters.md) —
+  the `"local"` provider: supported servers, endpoints, config, caveats.
 
 ---
 
