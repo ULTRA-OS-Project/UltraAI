@@ -1,8 +1,8 @@
-// TestHelpers.h — tiny cassert-based test harness shared by all suites.
+// TestHelpers.h — tiny test harness shared by all suites.
 #pragma once
 
-#include <cassert>
 #include <cstdio>
+#include <cstdlib>
 
 #define ULTRAAI_TEST(name) \
     static void name(); \
@@ -13,4 +13,13 @@
     static name##_runner name##_instance; \
     static void name()
 
-#define ULTRAAI_CHECK(cond) assert((cond))
+// NOT assert(): assert is compiled out under NDEBUG (Release), which would
+// skip the checks AND any side effects inside them, making suites vacuous.
+#define ULTRAAI_CHECK(cond)                                                  \
+    do {                                                                     \
+        if (!(cond)) {                                                       \
+            std::fprintf(stderr, "ULTRAAI_CHECK failed: %s (%s:%d)\n",       \
+                         #cond, __FILE__, __LINE__);                         \
+            std::abort();                                                    \
+        }                                                                    \
+    } while (0)
