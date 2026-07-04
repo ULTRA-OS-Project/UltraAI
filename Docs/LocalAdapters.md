@@ -85,3 +85,20 @@ Per `UltraNetIntegration.md`: connect/DNS failure → `Network`,
 `tests/TestLocalAdapters.cpp` runs the whole adapter family against an
 in-process fake server (`tests/FakeLocalServer.h`) bound to an ephemeral
 loopback port — CI needs no real model server, no network.
+
+## Smoke test against a real server
+
+`examples/SmokeLocal.cpp` (built with `-DULTRAAI_BUILD_EXAMPLES=ON`) drives
+an actual model server: chat, streaming chat, and embeddings. Run it on a
+machine with a local server up:
+
+```bash
+# llama.cpp:  llama-server -m model.gguf            (port 8080)
+./ultraai_smoke_local
+
+# Ollama:     ollama serve                          (port 11434)
+./ultraai_smoke_local http://127.0.0.1:11434 llama3.2
+```
+
+It prints each step's result and exits non-zero on failure. CI compiles it
+but doesn't run it (no model server on CI machines).

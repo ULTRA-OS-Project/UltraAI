@@ -9,7 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ---------------------------------------------------------------- options
 
-option(ULTRAAI_BUILD_TESTS   "Build UltraAI unit tests"                       OFF)
+option(ULTRAAI_BUILD_TESTS    "Build UltraAI unit tests"                      OFF)
+option(ULTRAAI_BUILD_EXAMPLES "Build UltraAI example binaries (smoke tests)"  OFF)
 option(ULTRAAI_USE_ULTRANET  "Link UltraNet for network adapters (opt-in)"    OFF)
 option(ULTRAAI_USE_ULTRAVAULT "Link UltraVault for named-secret lookup"       OFF)
 
@@ -122,6 +123,17 @@ if(ULTRAAI_BUILD_TESTS)
         if(WIN32)
             target_link_libraries(ultraai_test_local PRIVATE ws2_32)
         endif()
+    endif()
+endif()
+
+# ---------------------------------------------------------------- examples
+
+if(ULTRAAI_BUILD_EXAMPLES)
+    if(ULTRAAI_ADAPTER_LOCAL)
+        add_executable(ultraai_smoke_local examples/SmokeLocal.cpp)
+        target_link_libraries(ultraai_smoke_local PRIVATE ultraai)
+    else()
+        message(STATUS "UltraAI: examples need ULTRAAI_ADAPTER_LOCAL=ON — skipping")
     endif()
 endif()
 
